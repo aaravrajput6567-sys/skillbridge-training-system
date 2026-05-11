@@ -31,12 +31,12 @@ RUN composer dump-autoload --optimize
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
-# Expose port
-EXPOSE 8080
+# Default port (Render injects $PORT at runtime)
+EXPOSE 10000
 
-# Start command: cache config, run migrations, seed, start server
+# Start command — uses $PORT injected by Render (defaults to 10000)
 CMD php artisan config:cache && \
     php artisan route:cache && \
     php artisan migrate --force && \
     php artisan db:seed --force && \
-    php artisan serve --host=0.0.0.0 --port=8080
+    php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
