@@ -3,19 +3,21 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
-return [
+// Auto-parse DATABASE_URL if set (Railway provides this for PostgreSQL)
+if ($databaseUrl = env('DATABASE_URL')) {
+    $dbParsed = parse_url($databaseUrl);
+    config([
+        'database.default'                              => 'pgsql',
+        'database.connections.pgsql.host'              => $dbParsed['host'] ?? '127.0.0.1',
+        'database.connections.pgsql.port'              => $dbParsed['port'] ?? 5432,
+        'database.connections.pgsql.database'          => ltrim($dbParsed['path'] ?? 'laravel', '/'),
+        'database.connections.pgsql.username'          => $dbParsed['user'] ?? 'postgres',
+        'database.connections.pgsql.password'          => $dbParsed['pass'] ?? '',
+        'database.connections.pgsql.sslmode'           => 'require',
+    ]);
+}
 
-    /*
-    |--------------------------------------------------------------------------
-    | Default Database Connection Name
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify which of the database connections below you wish
-    | to use as your default connection for database operations. This is
-    | the connection which will be utilized unless another connection
-    | is explicitly specified when you execute a query / statement.
-    |
-    */
+return [
 
     'default' => env('DB_CONNECTION', 'sqlite'),
 
