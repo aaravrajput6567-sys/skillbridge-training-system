@@ -57,20 +57,4 @@ The seeders generate the following test accounts (Password for all is `password`
 - **Trainer**: `trainer@example.com`
 - **Employee**: `employee@example.com`
 
-## Academic Syllabus Checklist Achieved
 
-- [x] Laravel installation and project structure
-- [x] MVC architecture
-- [x] Composer & Artisan commands
-- [x] Routing (basic, parameters, constraints, groups, prefixes, named)
-- [x] Controllers (Resource controllers, ApiControllers)
-- [x] Middleware (Role-based, Localization)
-- [x] Blade templates & Inheritance
-- [x] Sessions & Cookies
-- [x] Localization (lang/en, lang/hi)
-- [x] File uploads (Storage facade)
-- [x] Sending emails (Mailables)
-- [x] Form validation (FormRequests, Custom Rules)
-- [x] Database migrations & Seeders
-- [x] Eloquent ORM CRUD
-- [x] REST API implementation
