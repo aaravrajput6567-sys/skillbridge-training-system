@@ -31,12 +31,11 @@ RUN composer dump-autoload --optimize
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
+# Make startup script executable
+RUN chmod +x /var/www/start.sh
+
 # Default port (Render injects $PORT at runtime)
 EXPOSE 10000
 
-# Start command — uses $PORT injected by Render (defaults to 10000)
-CMD php artisan config:cache && \
-    php artisan route:cache && \
-    php artisan migrate --force && \
-    php artisan db:seed --force && \
-    php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
+# Start via script that handles clean vs. dirty DB state
+CMD ["/bin/bash", "/var/www/start.sh"]
