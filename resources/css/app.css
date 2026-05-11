@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── Global select option theming ── */
+select option {
+    background-color: #1e0938;
+    color: #ffffff;
+}
+
+/* ── Consistent input color scheme for dark/date inputs ── */
+input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(1) opacity(0.6);
+    cursor: pointer;
+}
+
+/* ── Thin violet scrollbar ── */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 999px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
