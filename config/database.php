@@ -3,18 +3,28 @@
 use Illuminate\Support\Str;
 use Pdo\Mysql;
 
-// Auto-parse DATABASE_URL if set (Railway provides this for PostgreSQL)
+// Auto-parse DATABASE_URL if set (Render/Railway inject this for PostgreSQL)
+// Handles both postgres:// and postgresql:// schemes
 if ($databaseUrl = env('DATABASE_URL')) {
-    $dbParsed = parse_url($databaseUrl);
-    config([
-        'database.default'                              => 'pgsql',
-        'database.connections.pgsql.host'              => $dbParsed['host'] ?? '127.0.0.1',
-        'database.connections.pgsql.port'              => $dbParsed['port'] ?? 5432,
-        'database.connections.pgsql.database'          => ltrim($dbParsed['path'] ?? 'laravel', '/'),
-        'database.connections.pgsql.username'          => $dbParsed['user'] ?? 'postgres',
-        'database.connections.pgsql.password'          => $dbParsed['pass'] ?? '',
-        'database.connections.pgsql.sslmode'           => 'require',
-    ]);
+    // Normalize postgresql:// -> postgres:// so parse_url works
+    $normalizedUrl = preg_replace('/^postgresql:\/\//', 'postgres://', $databaseUrl);
+    $dbParsed = parse_url($normalizedUrl);
+
+    // Inject into $_ENV so env() calls below pick up correct values
+    $_ENV['DB_CONNECTION'] = 'pgsql';
+    $_SERVER['DB_CONNECTION'] = 'pgsql';
+    $_ENV['DB_HOST']       = $dbParsed['host'] ?? '127.0.0.1';
+    $_SERVER['DB_HOST']    = $dbParsed['host'] ?? '127.0.0.1';
+    $_ENV['DB_PORT']       = $dbParsed['port'] ?? 5432;
+    $_SERVER['DB_PORT']    = $dbParsed['port'] ?? 5432;
+    $_ENV['DB_DATABASE']   = ltrim($dbParsed['path'] ?? 'laravel', '/');
+    $_SERVER['DB_DATABASE'] = ltrim($dbParsed['path'] ?? 'laravel', '/');
+    $_ENV['DB_USERNAME']   = $dbParsed['user'] ?? 'postgres';
+    $_SERVER['DB_USERNAME'] = $dbParsed['user'] ?? 'postgres';
+    $_ENV['DB_PASSWORD']   = $dbParsed['pass'] ?? '';
+    $_SERVER['DB_PASSWORD'] = $dbParsed['pass'] ?? '';
+    $_ENV['DB_SSLMODE']    = 'require';
+    $_SERVER['DB_SSLMODE'] = 'require';
 }
 
 return [
@@ -98,7 +108,7 @@ return [
             'prefix' => '',
             'prefix_indexes' => true,
             'search_path' => 'public',
-            'sslmode' => env('DB_SSLMODE', 'prefer'),
+            'sslmode'       => env('DB_SSLMODE', 'prefer'),
         ],
 
         'sqlsrv' => [
