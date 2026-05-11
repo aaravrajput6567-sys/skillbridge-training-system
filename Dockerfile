@@ -1,9 +1,9 @@
-FROM php:8.3-cli
+FROM php:8.3-fpm
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git curl zip unzip libpng-dev libpq-dev libonig-dev libxml2-dev libzip-dev \
-    nodejs npm \
+    nginx nodejs npm \
     && docker-php-ext-install pdo pdo_pgsql pdo_mysql mbstring xml bcmath zip gd opcache \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
@@ -21,7 +21,7 @@ RUN composer install --no-dev --optimize-autoloader --no-interaction --no-script
 # Copy the rest of the application
 COPY . .
 
-# Install Node dependencies and build frontend
+# Install Node dependencies and build frontend assets
 RUN npm ci && npm run build
 
 # Run composer scripts that need the full app
@@ -31,11 +31,13 @@ RUN composer dump-autoload --optimize
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache \
     && chmod -R 775 /var/www/storage /var/www/bootstrap/cache
 
+# Copy nginx config
+COPY docker/nginx.conf /etc/nginx/sites-available/default
+
 # Make startup script executable
 RUN chmod +x /var/www/start.sh
 
-# Default port (Render injects $PORT at runtime)
+# Default port
 EXPOSE 10000
 
-# Start via script that handles clean vs. dirty DB state
 CMD ["/bin/bash", "/var/www/start.sh"]
