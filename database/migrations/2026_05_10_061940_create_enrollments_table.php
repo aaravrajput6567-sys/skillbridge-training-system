@@ -6,18 +6,25 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
+    /**
+     * Run the migrations.
+     */
     public function up(): void
     {
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->foreignId('training_program_id')->constrained()->onDelete('cascade');
-            $table->enum('status', ['enrolled', 'completed', 'dropped'])->default('enrolled');
-            $table->timestamp('enrolled_at')->useCurrent();
+            $table->enum('approval_status', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->date('enrollment_date')->nullable();
+            $table->enum('completion_status', ['enrolled', 'in_progress', 'completed', 'dropped'])->default('enrolled');
             $table->timestamps();
         });
     }
 
+    /**
+     * Reverse the migrations.
+     */
     public function down(): void
     {
         Schema::dropIfExists('enrollments');
